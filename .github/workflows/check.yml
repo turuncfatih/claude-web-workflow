@@ -1,0 +1,26 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  hygiene:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Broken links and agent definitions that do not follow the spec this
+      # repository teaches are the two ways a guide loses credibility.
+      - name: Links and agent specs
+        run: python3 scripts/check.py
+
+      # The slop checker must actually catch slop, and must pass clean copy.
+      - name: Slop checker self-test
+        run: python3 scripts/test_slop_check.py

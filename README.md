@@ -1,0 +1,217 @@
+# Claude Web Workflow
+
+**Building a website with Claude, end to end: which model does what, which skills to invoke when, which MCP servers to connect — and the measures that stop the result looking machine-made.**
+
+[![check](https://github.com/turuncfatih/claude-web-workflow/actions/workflows/check.yml/badge.svg)](https://github.com/turuncfatih/claude-web-workflow/actions/workflows/check.yml)
+[![licence](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+
+🇬🇧 English · [🇹🇷 Türkçe](README.tr.md)
+
+Not "here is a prompt that makes a landing page". This is the whole pipeline from
+an empty folder to a live, fast, secure, findable site — the division of labour
+between Opus, Sonnet and Haiku, the skills at each phase, Stitch for design,
+Artifacts for deciding, a second model for cold review, and the roles that check
+the result before anyone sees it.
+
+```
+14 chapters · 8 agent definitions · 1 working script · 1 end-to-end walkthrough
+```
+
+> **Companion repositories.**
+> [AgentForge](https://github.com/turuncfatih/agentforge) — the orchestration
+> machinery, implemented in .NET.
+> [Agent Team Playbook](https://github.com/turuncfatih/agent-team-playbook) — the
+> general method for designing agent teams. This repo is one team, applied.
+
+---
+
+## The one thing to take away
+
+A generated site is usually *correct*. It builds, it is responsive, it has
+headings — and a visitor can tell in two seconds that nobody decided anything.
+That recognition is a trust problem, and correctness does not fix it.
+
+So the whole workflow is built around one question:
+
+> **Would this page still work if you swapped in a different business's name?**
+
+If yes, nothing has been decided yet. [Chapter 5](docs/05-not-looking-ai-made.md)
+is the catalogue of tells, the countermeasures, and the roles that enforce them.
+
+---
+
+## Which model does what
+
+| Where | Model | What belongs there |
+|---|---|---|
+| **Main session** | Opus, high effort | Planning, routing, design direction, final judgment |
+| **Subagents** | Sonnet | Implementation, copy, verification — execution against a spec |
+| **Narrow, mechanical** | Haiku | Classification, extraction, narrating tool output |
+| **Fully deterministic** | *a script* | Counting, validating, diffing — not a model at all |
+
+The rule underneath:
+
+> **Reasoning scales with the irreversibility of the decision, not with the
+> prestige of the task.**
+
+The developer agent is **not** your top tier. With a precise spec, implementation
+is execution — the irreversible thinking already happened upstream. If your
+developer needs Opus, the usual cause is a thin spec, and upgrading the model
+hides it. [Chapter 1](docs/01-model-division-of-labour.md).
+
+---
+
+## Which tool for what
+
+| Task | Where | Why |
+|---|---|---|
+| Repo work, agents, builds | **Claude Code** | It has your files, roles and tools |
+| UI layout directions | **Stitch** (MCP) | Something to react against, so you skip the median layout |
+| Deciding between directions | **An Artifact** | Three directions, one switcher, a link you can send |
+| Illustration, avatars, OG art | **An image model** | Claude does not generate images |
+| UI icons | **An icon library** | Generated icon sets drift — and mixed icons are a loud tell |
+| Reading a very large corpus | **A long-context model** | Bring back a summary, not decisions |
+| Bulk classification | **A low-cost model, or a script** | Volume is a cost problem, not a capability one |
+| Cold review of finished copy | **Any model that did not write it** | No shared blind spot |
+
+That last row is the one people skip. A model reviewing its own output has the
+same blind spot that produced the problem — structurally identical to an agent
+approving its own work. [Chapter 13](docs/13-which-ai-for-what.md).
+
+---
+
+## The team
+
+Eight roles, plus the main session. **One writer. Two vetoes, different in kind.**
+
+| Role | Artifact | Writes? | Model | Veto |
+|---|---|:---:|---|:---:|
+| *main session* | The plan, the final call | ✗ | **Opus** | — |
+| `designer` | Design spec | ✗ | **Opus** | ✗ |
+| `content-writer` | Page copy | ✗ | Sonnet | ✗ |
+| `web-dev` | Working pages | ✅ | Sonnet | ✗ |
+| `design-critic` | "This looks like a template" | ✗ | Sonnet | ✗ |
+| `slop-auditor` | "This reads like a machine wrote it" | ✗ | Sonnet | ✗ |
+| `seo-auditor` | "Nobody will find this" | ✗ | Haiku | ✗ |
+| `security-reviewer` | "This is unsafe to ship" | ✗ | **Opus** | ✅ judgment |
+| `release-verifier` | "This does not run" | ✗ | Sonnet | ✅ fact |
+
+```
+main session plans
+   ├─ designer ───────┐   (parallel)
+   └─ content-writer ─┤
+                      ▼
+                 web-dev  ← the only role that touches the repo
+                      ▼
+       [ scripts: build · slop_check.py ]
+                      ▼
+            release-verifier   ── FACT VETO, alone and first
+                      ▼
+   ┌──────────┬──────────────┬─────────────────┐   (parallel)
+   ▼          ▼              ▼                 ▼
+design-critic  slop-auditor  seo-auditor  security-reviewer
+                                          ── JUDGMENT VETO
+                      ▼
+      main session: ship · revise · escalate
+```
+
+Eight exceeds the playbook's own guideline of three to six, so
+[agents/README.md](agents/README.md) argues it explicitly — including the seven
+roles that were merged away and why these four critics stayed separate.
+
+---
+
+## The slop check
+
+A real script, no dependencies, in this repository:
+[`scripts/slop_check.py`](scripts/slop_check.py)
+
+```bash
+python3 scripts/slop_check.py dist/
+```
+
+```
+HIGH  (10)
+  bad.html  [slop-phrase]        "in today's fast-paced world"
+  bad.html  [slop-phrase]        "we've got you covered"
+  bad.html  [unsourced-number]   "99%" in: We are trusted by thousands…
+  bad.html  [structure]          2 <h1> elements, expected exactly 1
+MEDIUM (2)
+  bad.html  [structure]          title is 65 chars (max 60)
+LOW   (1)
+  bad.html  [uniform-rhythm]     5 paragraphs, length spread 0.22 — too even
+```
+
+It exits non-zero, so it belongs in CI. It checks forbidden phrases (English and
+Turkish), hedging density, the three-adjective reflex, unsourced numbers,
+paragraph-length uniformity and structural SEO.
+
+**Its lists are meant to grow.** Every tell that gets past you becomes a line in
+the script, and then it never gets past you again. What survives the script goes
+to `slop-auditor`, which applies the tests a regex cannot: whether a claim is
+specific, and whether a competitor could dispute it.
+
+---
+
+## Chapters
+
+| # | Chapter | |
+|---|---|---|
+| 0 | [Setup](docs/00-setup.md) | From an empty folder. `CLAUDE.md`, the file that does the most work |
+| 1 | [Which model does what](docs/01-model-division-of-labour.md) | Opus / Sonnet / Haiku, by phase, with the cost shape |
+| 2 | [The skills map](docs/02-skills-map.md) | Which skill at which phase |
+| 3 | [MCP servers](docs/03-mcp-servers.md) | Stitch, browser automation, hosting — and what not to connect |
+| 4 | [The design flow](docs/04-design-flow.md) | Brief → three directions → react → spec |
+| 5 | [**Not looking machine-made**](docs/05-not-looking-ai-made.md) | ★ The tells, the countermeasures, the roles that enforce them |
+| 6 | [Visual assets](docs/06-visual-assets.md) | Icons, avatars, the locked style anchor, the revision loop |
+| 7 | [SEO and GEO](docs/07-seo-geo-flow.md) | Ranking pages and being cited in answers |
+| 8 | [Performance](docs/08-performance.md) | LCP / INP / CLS, and the decisions made at the start |
+| 9 | [Security](docs/09-security.md) | Secrets, forms, headers, third-party scripts |
+| 10 | [Verification](docs/10-verification.md) | Scripts first, agents second. Two vetoes, not three |
+| 11 | [Shipping on Cloudflare](docs/11-shipping-cloudflare.md) | Pages, `_headers`, `_redirects`, caching, WAF |
+| 12 | [Artifacts for design review](docs/12-artifacts-for-design-review.md) | Three directions, one switcher, a link instead of a meeting |
+| 13 | [Which AI for what](docs/13-which-ai-for-what.md) | Claude, image models, long-context, low-cost — by task shape |
+
+**Start with 5 and 1.** Then the [walkthrough](walkthrough/).
+
+---
+
+## Contents
+
+```
+docs/             14 chapters
+agents/           8 role definitions, ready to copy into .claude/agents/
+walkthrough/      empty folder → live site, with the actual commands
+reference/
+  skills-catalogue.md   every skill, one line each, by phase
+  prompts.md            the handful where wording changes the output
+scripts/
+  slop_check.py         mechanical detection of machine-written copy
+```
+
+---
+
+## Using it
+
+```bash
+git clone <repo-url> && cd claude-web-workflow
+
+# the team
+cp agents/*.md ~/.claude/agents/
+
+# the check
+cp scripts/slop_check.py <your-project>/scripts/
+
+# the design MCP server
+claude mcp add --transport http stitch https://stitch.googleapis.com/mcp
+```
+
+Then read the [walkthrough](walkthrough/) and follow it once.
+
+The specifics here are a static Astro site on Cloudflare Pages. **The roles and
+the sequence transfer; the stack details do not.** Rewrite `CLAUDE.md` for yours
+and keep the shape.
+
+---
+
+**Licence** · MIT — copy the agents, copy the script, copy the method.
