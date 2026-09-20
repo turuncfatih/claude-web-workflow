@@ -17,10 +17,9 @@ inceleme için ikinci bir model, ve sonucu kimse görmeden denetleyen roller.
 ```
 
 > **Kardeş repolar.**
-> [AgentForge](https://github.com/turuncfatih/agentforge) — orkestrasyon
-> makinesi, .NET ile yazılmış hali.
-> [Agent Team Playbook](https://github.com/turuncfatih/agent-team-playbook) —
-> ajan ekibi tasarlamanın genel yöntemi. Bu repo o yöntemin uygulanmış bir ekibi.
+> [Claude Mobile Workflow](https://github.com/turuncfatih/claude-mobile-workflow) — aynı akışın React Native hali.
+> [Agent Team Playbook](https://github.com/turuncfatih/agent-team-playbook) — ajan ekibi tasarlamanın genel yöntemi.
+> [AgentForge](https://github.com/turuncfatih/agentforge) — orkestrasyon makinesi, .NET ile.
 
 ---
 

@@ -18,10 +18,9 @@ the result before anyone sees it.
 ```
 
 > **Companion repositories.**
-> [AgentForge](https://github.com/turuncfatih/agentforge) — the orchestration
-> machinery, implemented in .NET.
-> [Agent Team Playbook](https://github.com/turuncfatih/agent-team-playbook) — the
-> general method for designing agent teams. This repo is one team, applied.
+> [Claude Mobile Workflow](https://github.com/turuncfatih/claude-mobile-workflow) — the same workflow for a React Native app.
+> [Agent Team Playbook](https://github.com/turuncfatih/agent-team-playbook) — the general method for designing agent teams.
+> [AgentForge](https://github.com/turuncfatih/agentforge) — the orchestration machinery, implemented in .NET.
 
 ---
 
