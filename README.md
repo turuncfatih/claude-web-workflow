@@ -24,6 +24,79 @@ the result before anyone sees it.
 
 ---
 
+## Why this exists
+
+### The problem is not that building a website is hard
+
+It stopped being hard. Anyone can now describe a landing page and have working
+HTML in ten minutes. That is genuinely new, and it is also the problem: **the
+bottleneck moved from producing to judging.**
+
+What comes out of that ten minutes is usually *correct*. It builds. It is
+responsive. It has headings and alt text. And it is worth very little, because:
+
+| What you get by default | Why it costs you |
+|---|---|
+| A page that looks like every other generated page | A visitor decides in two seconds whether anyone cared. Generic design reads as a business that does not |
+| Copy that could belong to any company | "Quality service, tailored to your needs" says nothing a competitor would not also say |
+| Invented numbers and testimonials | A fabricated statistic on a business's website is not a style problem |
+| Nobody checked whether it renders | The build passed. That is not the same as the page working |
+| No structured data, no crawl path | Correct and invisible |
+| A 6 MB hero image and three tracking scripts | Slow on the connection your customers actually have |
+
+None of these are capability failures. A model can write good copy, design a
+considered page and produce valid schema. **They are process failures** — there
+was no step that caught anything, because one agent produced the work and the
+same agent declared it finished.
+
+### Why a process, and not just a better prompt
+
+A better prompt improves the first draft. It does not create a feedback loop.
+
+The three things that actually change the result are structural, not textual:
+
+1. **Someone other than the author reviews it.** An agent reviewing its own
+   output carries the blind spot that produced the problem. This is the same
+   reason you do not merge your own pull request.
+2. **Something can say no.** A review that cannot stop a release is a comment.
+   One role holds a veto, on facts — it built, or it did not.
+3. **The deterministic parts are scripts, not judgment.** Counting characters,
+   validating JSON-LD, finding a forbidden phrase — a regular expression does
+   that instantly, for free, identically every time. Asking a model to do it is
+   slower, costs money, and occasionally disagrees with itself.
+
+That is the whole shape of this repository. Everything else is detail.
+
+### Why these tools, specifically
+
+Each choice here is defended in its chapter, but the short version:
+
+| Choice | Reason |
+|---|---|
+| **A static site** | A marketing site is documents. Documents do not need a framework at runtime, and zero JavaScript makes the performance problem disappear rather than get tuned. Nothing here depends on Astro specifically |
+| **Cloudflare Pages** | CDN, TLS, DDoS mitigation and preview URLs are solved problems. `_headers` and `_redirects` live in the repo, so what would otherwise be server configuration is reviewable in a diff |
+| **Opus in the main session** | A wrong plan wastes every step after it. That is the most irreversible decision in the project and the cheapest to get right |
+| **Sonnet in the subagents** | With a precise spec, implementation is execution. Paying frontier prices for it buys nothing |
+| **An image model for illustration, an icon library for icons** | Generated icon sets drift in stroke weight and style, and mixed icons are the loudest sign nobody designed the page |
+| **Stitch for layout** | Describing a layout in prose gets you the layout prose describes most easily — which is why generated pages look alike. Reacting to three options breaks that |
+
+### What this actually gives you
+
+Not faster output. You can already get fast output.
+
+- A page a visitor cannot swap another business's name into
+- Copy where every claim is one a competitor might genuinely dispute
+- A site that was **verified to render** before anyone called it done
+- Structured data and a crawl path, so the work is findable
+- Security headers and a CSP, added while the site was small enough for it to be free
+- A cost you can explain, because the spending follows the irreversibility of the decision rather than the prestige of the task
+
+If you already have a review step, a verifier and a cost model, you will find
+little here. If your current process is "generate, look at it, ship", this is the
+missing half.
+
+---
+
 ## The one thing to take away
 
 A generated site is usually *correct*. It builds, it is responsive, it has

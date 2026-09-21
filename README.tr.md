@@ -23,6 +23,79 @@ inceleme için ikinci bir model, ve sonucu kimse görmeden denetleyen roller.
 
 ---
 
+## Bu repo neden var
+
+### Sorun, web sitesi yapmanın zor olması değil
+
+Zor olmaktan çıktı. Artık herkes bir landing page tarif edip on dakikada çalışan
+HTML alabiliyor. Bu gerçekten yeni bir şey, ve sorun da tam burada: **darboğaz
+üretmekten yargılamaya kaydı.**
+
+O on dakikadan çıkan şey genelde **doğrudur**. Derlenir. Responsive'dir. Başlıkları
+ve alt metinleri vardır. Ve çok az değer taşır, çünkü:
+
+| Varsayılan olarak aldığın | Sana maliyeti |
+|---|---|
+| Diğer bütün üretilmiş sayfalar gibi duran bir sayfa | Ziyaretçi iki saniyede birinin önemseyip önemsemediğine karar veriyor. Jenerik tasarım, önemsemeyen bir işletme demek |
+| Herhangi bir şirkete ait olabilecek metin | "Kaliteli hizmet, ihtiyacınıza özel" — bir rakibin de söylemeyeceği hiçbir şey söylemiyor |
+| Uydurulmuş sayılar ve referanslar | Bir işletmenin sitesindeki uydurma istatistik bir üslup sorunu değildir |
+| Sayfanın çizilip çizilmediğini kimse kontrol etmedi | Derleme geçti. Bu, sayfanın çalışmasıyla aynı şey değil |
+| Yapısal veri yok, tarama yolu yok | Doğru ve görünmez |
+| 6 MB'lık hero görseli ve üç takip script'i | Müşterilerinin gerçekten sahip olduğu bağlantıda yavaş |
+
+Bunların hiçbiri **yetenek** sorunu değil. Bir model iyi metin yazabilir,
+düşünülmüş bir sayfa tasarlayabilir, geçerli schema üretebilir. **Bunlar süreç
+sorunu** — hiçbir şeyi yakalayan bir adım yoktu, çünkü işi bir ajan üretti ve
+bittiğini de aynı ajan ilan etti.
+
+### Neden süreç, neden sadece daha iyi bir prompt değil
+
+Daha iyi bir prompt ilk taslağı iyileştirir. Bir geri besleme döngüsü kurmaz.
+
+Sonucu gerçekten değiştiren üç şey metinsel değil, yapısal:
+
+1. **Yazandan başka biri inceler.** Kendi çıktısını inceleyen ajan, o sorunu
+   üreten kör noktayı taşıyor. Kendi pull request'ini merge etmeme sebebinle
+   aynı sebep.
+2. **Bir şey hayır diyebilir.** Yayını durduramayan inceleme, yorumdur. Bir rol
+   veto taşıyor, ve olgulara dayanıyor — derlendi ya da derlenmedi.
+3. **Deterministik kısımlar script'tir, yargı değil.** Karakter saymak, JSON-LD
+   doğrulamak, yasak bir kalıbı bulmak — bir regex bunu anında, bedava ve her
+   seferinde aynı şekilde yapıyor. Modele sormak daha yavaş, para yiyor, ve arada
+   kendisiyle çelişiyor.
+
+Bu reponun bütün şekli bu. Geri kalanı detay.
+
+### Neden özellikle bu araçlar
+
+Her seçim kendi bölümünde savunuluyor, kısa hali:
+
+| Seçim | Sebep |
+|---|---|
+| **Statik site** | Pazarlama sitesi belgedir. Belgelerin çalışma anında framework'e ihtiyacı yok, ve sıfır JavaScript performans sorununu ayarlanacak bir şey olmaktan çıkarıp **ortadan kaldırıyor**. Buradaki hiçbir şey özellikle Astro'ya bağlı değil |
+| **Cloudflare Pages** | CDN, TLS, DDoS koruması ve preview URL'leri çözülmüş problemler. `_headers` ve `_redirects` repoda duruyor, yani normalde sunucu yapılandırması olacak şey diff'te incelenebiliyor |
+| **Ana oturumda Opus** | Yanlış bir plan kendinden sonraki her adımı çöpe atıyor. Projedeki en geri alınamaz karar, ve doğru yapması en ucuz olan |
+| **Alt ajanlarda Sonnet** | Net bir spesifikasyonla uygulama icradır. Buna frontier fiyatı ödemek hiçbir şey kazandırmıyor |
+| **İllüstrasyon için görsel modeli, ikon için ikon kütüphanesi** | Üretilen ikon setleri çizgi kalınlığı ve stilde kayıyor, ve karışık ikonlar sayfayı kimsenin tasarlamadığının en bariz işareti |
+| **Düzen için Stitch** | Bir düzeni yazıyla tarif etmek, sana dilin en kolay tarif ettiği düzeni veriyor — üretilen sayfaların birbirine benzemesinin sebebi bu. Üç seçeneğe tepki vermek bunu kırıyor |
+
+### Bu sana aslında ne veriyor
+
+Daha hızlı çıktı değil. Hızlı çıktıyı zaten alabiliyorsun.
+
+- Ziyaretçinin başka bir firma adı koyamayacağı bir sayfa
+- Her iddiasının, bir rakibin gerçekten itiraz edebileceği türden olduğu bir metin
+- Bitti denmeden önce **çizildiği doğrulanmış** bir site
+- Yapısal veri ve tarama yolu — yani bulunabilir bir iş
+- Site hâlâ küçükken, bedavaya eklenmiş güvenlik header'ları ve CSP
+- Açıklayabildiğin bir maliyet, çünkü harcama işin prestijine değil kararın geri
+  alınabilirliğine göre dağılıyor
+
+Zaten bir inceleme adımın, bir doğrulayıcın ve bir maliyet modelin varsa burada
+az şey bulursun. Mevcut sürecin "üret, bak, yayınla" ise, eksik yarısı bu.
+
+---
+
 ## Akılda kalması gereken tek şey
 
 Üretilmiş bir site genelde **doğrudur**. Derlenir, responsive'dir, başlıkları
