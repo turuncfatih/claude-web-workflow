@@ -80,9 +80,28 @@ Static marketing site for <business>. Deployed to <host> on push to main.
 3. No delivery-time promises. Use written scope and fixed-price language.
 4. No invented metrics. Percentages, ratings and customer counts need a source.
 
+## Output discipline
+1. Create no file the task did not ask for. No SUMMARY.md, NOTES.md, CHANGES.md.
+2. Comments explain why, never what. Rename instead of explaining.
+3. No commented-out code. Git remembers it.
+4. Report in one or two sentences. The diff is the summary.
+
 ## Commands
 - `npx astro build`  — must pass with zero errors before anything ships
 ```
+
+The **output discipline** block is there because an agent left alone optimises
+for *looking* diligent: a summary file after every task, a comment on every line,
+a bulleted recap at the end of every reply. None of it was asked for, and all of
+it rots — a stale summary actively misleads the next reader, and a comment
+restating code becomes a lie the first time the code changes.
+
+> **The diff is the report. The code is the documentation. Everything else has to
+> earn its place.**
+
+Treat a `SUMMARY.md` appearing in a diff as a review finding, the same category
+as a hardcoded colour. The full argument is
+[anti-pattern 12 in the playbook](https://github.com/turuncfatih/agent-team-playbook/blob/main/docs/07-anti-patterns.md).
 
 The four invariants above are worth copying almost verbatim. Numbers 3 and 4
 prevent the two failure modes that make a site read as machine-written, and no
